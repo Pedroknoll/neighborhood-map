@@ -1,0 +1,9 @@
+/* General styling */
+# {
+  box-sizing: border-box;
+}
+
+/* Map styling */
+#map {
+  height: 100%;
+}

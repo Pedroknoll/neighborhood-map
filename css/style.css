@@ -1,9 +1,56 @@
-/* General styling */
+/* GENERAL STYLING */
 # {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+html, body {
+  margin: 0;
+}
 
-/* Map styling */
+/* HEADER */
+.header-container {
+  border-bottom: 1px solid #f5f5f5;
+  background-color: #ffffff;
+}
+#toggle-button {
+  padding: 1.5em;
+  background-color: #f3f3f3;
+}
+.logo {
+  padding: 1.5em;
+}
+
+/* MAIN CONTENT */
+/* sidebar */
+#sidebar-wrapper {
+  z-index: 1;
+  position: absolute;
+  width: 0;
+  height: calc(100vh - 4.625em);
+  overflow-y: hidden;
+  background-color: #ffffff;
+  -webkit-transition: all .2s linear 0s;
+  transition: all .2s linear 0s;
+}
+
+/* page content */
+#page-content-wrapper {
+  width: 100%;
+  position: absolute;
+  padding: 0;
+}
 #map {
-  height: 100vh;
+  height: calc(100vh - 4.625em);
+}
+
+/* animation sidebar is visible */
+#wrapper.menu--visible #sidebar-wrapper {
+  width: 20%;
+  border-right: 1px solid #f2f2f2;
+}
+#wrapper.menu--visible #page-content-wrapper {
+  padding-left: 20%;
+  -webkit-transition: all .2s linear 0s;
+  transition: all .2s linear 0s;
 }

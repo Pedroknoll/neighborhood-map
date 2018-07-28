@@ -17,8 +17,16 @@ html, body {
   padding: 1.5em;
   background-color: #f3f3f3;
 }
+.rotated {
+  transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+}
 .logo {
   padding: 1.5em;
+  font-weight: bold;
 }
 
 /* MAIN CONTENT */
@@ -27,7 +35,7 @@ html, body {
   z-index: 1;
   position: absolute;
   width: 0;
-  height: calc(100vh - 4.625em);
+  height: calc(100vh - 4.6875em);
   overflow-y: hidden;
   background-color: #ffffff;
   -webkit-transition: all .2s linear 0s;
@@ -41,16 +49,16 @@ html, body {
   padding: 0;
 }
 #map {
-  height: calc(100vh - 4.625em);
+  height: calc(100vh - 4.6875em);
 }
 
 /* animation sidebar is visible */
 #wrapper.menu--visible #sidebar-wrapper {
-  width: 20%;
+  width: 25%;
   border-right: 1px solid #f2f2f2;
 }
 #wrapper.menu--visible #page-content-wrapper {
-  padding-left: 20%;
+  padding-left: 25%;
   -webkit-transition: all .2s linear 0s;
   transition: all .2s linear 0s;
 }

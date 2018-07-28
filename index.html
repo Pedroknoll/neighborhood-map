@@ -18,8 +18,10 @@
   <body>
 
     <header class="header-container d-flex">
-      <a href="#" id="toggle-button" >+</a>
-      <div class="logo">LOGO</div>
+      <a href="#" id="toggle-button" >
+        <img src="img/menu_icon.svg">
+      </a>
+      <div class="logo">AVENTUR</div>
     </header>
 
     <main id="wrapper" class="d-flex p-0">
@@ -45,6 +47,7 @@
     <script>
       $('#toggle-button').click(function(event){
         event.preventDefault();
+        $("img", this).toggleClass('rotated');
         $('#wrapper').toggleClass('menu--visible');
       });
     </script>

@@ -1,4 +1,3 @@
-// show array of locations
 var locations =  [
     {
       name: '90 Graus',

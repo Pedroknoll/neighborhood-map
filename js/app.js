@@ -1,3 +1,4 @@
+
 function initMap(){
 
   var mapCenterPoint = {
@@ -24,3 +25,21 @@ function initMap(){
   });
 
 };
+
+
+
+
+var ViewModel = function(){
+  var self = this;
+
+  // menu toggle visibilty
+  self.isVisible = ko.observable(false);
+  self.toggleVisibility = function(){
+    self.isVisible(!self.isVisible());
+  }
+
+
+
+}
+
+ko.applyBindings(new ViewModel());

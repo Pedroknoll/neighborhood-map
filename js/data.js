@@ -1,4 +1,4 @@
-var venueData: [
+var venueData =  [
     {
       name: '90 Graus',
       description: 'A 90 Graus foi criada no ano de 1994, tornando-se, assim, o primeiro espaço voltado exclusivamente para escalada esportiva no país.',
@@ -41,4 +41,4 @@ var venueData: [
       lat: -23.54124,
       lng: -46.700801
     }
-  ];
+  ]; // venueData

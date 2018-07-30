@@ -18,13 +18,13 @@
   <body>
 
     <header class="header-container d-flex">
-      <a href="#" id="toggle-button" >
-        <img src="img/menu_icon.svg">
+      <a href="#" id="toggle-button" data-bind="click:toggleVisibility">
+        <img src="img/menu_icon.svg" data-bind="css:{'rotated' : isVisible}">
       </a>
       <div class="logo">AVENTUR</div>
     </header>
 
-    <main id="wrapper" class="d-flex p-0">
+    <main id="wrapper" class="d-flex p-0" data-bind="css:{'menu--visible' : isVisible}">
 
       <aside id="sidebar-wrapper">
         <div></div>
@@ -44,14 +44,6 @@
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBGYIY8HNPbJkCrGZNljqLzQ52pN8tU0MI&callback=initMap">
     </script>
 
-    <!-- menu toggle script MOVE TO JS FOLDER !-->
-    <script>
-      $('#toggle-button').click(function(event){
-        event.preventDefault();
-        $("img", this).toggleClass('rotated');
-        $('#wrapper').toggleClass('menu--visible');
-      });
-    </script>
 
   </body>
 

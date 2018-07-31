@@ -52,5 +52,14 @@ var locations =  [
         lat: -23.54124,
         lng: -46.700801
       }
+    },
+    {
+      name: 'Fun Wake Park',
+      description: 'Localizado dentro da Estância Alto da Serra (um dos maiores espaços para shows, eventos e lazer do Brasil), o "Fun Wake Park" conta com ótima estrutura - tanto para iniciantes como para atletas que já têm expêriencia em rampas e obstáculos.',
+      category: 'Wakeboard',
+      location: {
+        lat: -23.791699,
+        lng: -46.506069
+      }
     }
   ]; // locations

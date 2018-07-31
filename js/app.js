@@ -107,7 +107,7 @@ var ViewModel = function(){
     // check to make sure that infowindow is not already open on this marker
     if (infowindow.marker != marker) {
       infowindow.marker = marker;
-      infowindow.setContent('<div>' + marker.title + '</div>');
+      infowindow.setContent('<h2>' + marker.title + '</h2>');
       infowindow.open(map, marker);
       // make sure that marker property is ccleared if infowindow is closed.
       infowindow.addListener('closeclick',function(){

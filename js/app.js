@@ -28,14 +28,15 @@ var ViewModel = function(){
     self.isVisible(!self.isVisible());
   };
 
-  // create the markers according the list of location into data.js
+  // set up the markers render into the map
   var createMarkers = function(){
     var bounds = new google.maps.LatLngBounds();
 
-    // creates marker icons
+    // create custom marker icons symbols
     var defaultIcon = createMarkerIcon('#1f2fda', '#ffffff');
     var highlightedIcon = createMarkerIcon('#ffffff','#1f2fda');
 
+    // iterate through the locations list from data.js
     for(var i = 0; i < locations.length; i++){
       // get position from locations
       var position = locations[i].location;
@@ -53,13 +54,15 @@ var ViewModel = function(){
       markers.push(marker);
       // extends the boundaries of the map for each marker
       bounds.extend(marker.position);
-      // set icons for events of mouseover and mouseout
+      // set marker icons event listeners for mouseover and for mouseout
       marker.addListener('mouseover', function() {
         this.setIcon(highlightedIcon);
       });
       marker.addListener('mouseout', function() {
         this.setIcon(defaultIcon);
       });
+      // when clicked, the marker bounces
+      marker.addListener('click', toggleBounce);
 
     };
     map.fitBounds(bounds);
@@ -69,7 +72,8 @@ var ViewModel = function(){
   // passing as parameters
   function createMarkerIcon(markerFillColor, markerBorderColor){
     return {
-      path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
+      path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,' +
+      '-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
       scale: 1.1,
       fillOpacity: 1,
       fillColor: markerFillColor,
@@ -77,6 +81,21 @@ var ViewModel = function(){
       strokeWeight: 2
     };
   };
+
+  // Bounces a marker three times
+  function toggleBounce(){
+    marker = this;
+    if (marker.getAnimation() !== null){
+      marker.setAnimation(null);
+    } else {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(function(){
+        marker.setAnimation(null);
+      }, 1800);
+    };
+  }
+
+
 
 }
 
@@ -87,3 +106,29 @@ var init = function(){
 
   ko.applyBindings(new ViewModel());
 }
+
+
+
+/* TO DO
+- when click the marker
+--- bounce whith timeout
+--- open infowindow
+
+marker.addListener('click', CALLBACK);
+
+function CALLBACK(){
+  if (marker.getAnimation() !== null){
+    marker.setAnimation(null);
+  } else {
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(function(){
+      marker.setAnimation(null);
+    }, 900);
+  };
+}
+
+- info window for markers with third part apis
+- list of locations
+- filter field
+- error event handlers
+*/

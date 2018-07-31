@@ -32,6 +32,9 @@ var ViewModel = function(){
   var createMarkers = function(){
     var bounds = new google.maps.LatLngBounds();
 
+    var largeInfowindow = new google.maps.InfoWindow();
+
+
     // create custom marker icons symbols
     var defaultIcon = createMarkerIcon('#1f2fda', '#ffffff');
     var highlightedIcon = createMarkerIcon('#ffffff','#1f2fda');
@@ -52,6 +55,10 @@ var ViewModel = function(){
       });
       // push the marker to the marker array
       markers.push(marker);
+      // create an event to open the infowindow
+      marker.addListener('click', function() {
+        populateInfoWindow(this, largeInfowindow);
+      });
       // extends the boundaries of the map for each marker
       bounds.extend(marker.position);
       // set marker icons event listeners for mouseover and for mouseout
@@ -91,11 +98,23 @@ var ViewModel = function(){
       marker.setAnimation(google.maps.Animation.BOUNCE);
       setTimeout(function(){
         marker.setAnimation(null);
-      }, 1800);
+      }, 1300);
     };
-  }
+  };
 
-
+  // Populate info InfoWindow
+  function populateInfoWindow(marker, infowindow) {
+    // check to make sure that infowindow is not already open on this marker
+    if (infowindow.marker != marker) {
+      infowindow.marker = marker;
+      infowindow.setContent('<div>' + marker.title + '</div>');
+      infowindow.open(map, marker);
+      // make sure that marker property is ccleared if infowindow is closed.
+      infowindow.addListener('closeclick',function(){
+        infowindow.setMarker = null;
+      });
+    }
+  };
 
 }
 

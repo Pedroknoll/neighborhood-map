@@ -1,21 +1,40 @@
 'use strict';
 
-var map, marker;
+var map;
 
 // create an empty array to store the markers
 var markers = [];
 
-
-
 // initizalize the map
 function initMap() {
-	map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: -23.582944, lng: -46.674069},
+
+	var mapOptions = {
+		center: {lat: -23.582944, lng: -46.674069},
     zoom: 12,
+		gestureHandling: 'cooperative',
     styles: mapStyles,
     mapTypeControl: false
-	});
-}
+	};
+
+	map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+	var initialCenter = mapOptions.center;
+	var initialZoom = map.getZoom();
+
+	goToInitialPosition(map, initialCenter, initialZoom);
+
+	// function to return to center when click right button on mouse
+	function goToInitialPosition(map, center, zoom){
+		google.maps.event.addListener(map, 'rightclick', function(){
+			map.setCenter(center);
+			map.setZoom(zoom);
+		});
+	};
+};
+
+
+
+
 
 
 var ViewModel = function(){
@@ -44,6 +63,7 @@ var ViewModel = function(){
       // get position from locations
       var position = locations[i].location;
       var title = locations[i].name;
+
       // create a marker per location
       var marker = new google.maps.Marker({
         map: map,
@@ -129,8 +149,12 @@ var init = function(){
 
 
 /* TO DO
-- info window for markers with third part apis
-- list of locations
-- filter field
+- config infowindow
+--- add description
+--- add category
+--- add third part api (foursquare)
+
+- config filter
+- confirg list
 - error event handlers
 */

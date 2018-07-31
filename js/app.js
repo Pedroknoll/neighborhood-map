@@ -55,10 +55,6 @@ var ViewModel = function(){
       });
       // push the marker to the marker array
       markers.push(marker);
-      // create an event to open the infowindow
-      marker.addListener('click', function() {
-        populateInfoWindow(this, largeInfowindow);
-      });
       // extends the boundaries of the map for each marker
       bounds.extend(marker.position);
       // set marker icons event listeners for mouseover and for mouseout
@@ -68,8 +64,13 @@ var ViewModel = function(){
       marker.addListener('mouseout', function() {
         this.setIcon(defaultIcon);
       });
-      // when clicked, the marker bounces
-      marker.addListener('click', toggleBounce);
+			// add click event handlers to the marker
+			marker.addListener('click', function(){
+				// when clicked, the marker bounces
+				toggleBounce(this);
+				// create an event to open the infowindow
+				populateInfoWindow(this, largeInfowindow);
+			});
 
     };
     map.fitBounds(bounds);
@@ -90,8 +91,7 @@ var ViewModel = function(){
   };
 
   // Bounces a marker three times
-  function toggleBounce(){
-    marker = this;
+  function toggleBounce(marker){
     if (marker.getAnimation() !== null){
       marker.setAnimation(null);
     } else {
@@ -129,23 +129,6 @@ var init = function(){
 
 
 /* TO DO
-- when click the marker
---- bounce whith timeout
---- open infowindow
-
-marker.addListener('click', CALLBACK);
-
-function CALLBACK(){
-  if (marker.getAnimation() !== null){
-    marker.setAnimation(null);
-  } else {
-    marker.setAnimation(google.maps.Animation.BOUNCE);
-    setTimeout(function(){
-      marker.setAnimation(null);
-    }, 900);
-  };
-}
-
 - info window for markers with third part apis
 - list of locations
 - filter field

@@ -1,13 +1,14 @@
 'use strict';
 
 var map;
-
 // create an empty array to store the markers
 var markers = [];
 
-// initizalize the map
+
+// Set up the map for initialization.
 function initMap() {
 
+	// setup the map constructor passing the mapOptions literal object
 	var mapOptions = {
 		center: {lat: -23.582944, lng: -46.674069},
     zoom: 12,
@@ -15,15 +16,14 @@ function initMap() {
     styles: mapStyles,
     mapTypeControl: false
 	};
-
 	map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
-	var initialCenter = mapOptions.center;
+	// assign to variables the map center and zoom when rendered
+	var initialCenter = map.getCenter();
 	var initialZoom = map.getZoom();
-
 	goToInitialPosition(map, initialCenter, initialZoom);
 
-	// function to return to center when click right button on mouse
+	// function to return to center when click on the right mouse button
 	function goToInitialPosition(map, center, zoom){
 		google.maps.event.addListener(map, 'rightclick', function(){
 			map.setCenter(center);
@@ -33,15 +33,10 @@ function initMap() {
 };
 
 
-
-
-
-
 var ViewModel = function(){
   var self = this;
 
   self.isVisible = ko.observable(true);
-
   // show/hide sidebar when the toggle button is clicked
   self.toggleVisibility = function(){
     self.isVisible(!self.isVisible());
@@ -53,22 +48,26 @@ var ViewModel = function(){
 
     var largeInfowindow = new google.maps.InfoWindow();
 
-
     // create custom marker icons symbols
     var defaultIcon = createMarkerIcon('#1f2fda', '#ffffff');
     var highlightedIcon = createMarkerIcon('#ffffff','#1f2fda');
 
     // iterate through the locations list from data.js
     for(var i = 0; i < locations.length; i++){
-      // get position from locations
+
+      // get position, title, description and category from locations
       var position = locations[i].location;
       var title = locations[i].name;
+			var description = locations[i].description;
+			var categories = locations[i].categories;
 
       // create a marker per location
       var marker = new google.maps.Marker({
         map: map,
         position: position,
         title: title,
+				description: description,
+				categories: categories,
         icon: defaultIcon,
         animation: google.maps.Animation.DROP,
         id: i
@@ -127,8 +126,18 @@ var ViewModel = function(){
     // check to make sure that infowindow is not already open on this marker
     if (infowindow.marker != marker) {
       infowindow.marker = marker;
-      infowindow.setContent('<h2>' + marker.title + '</h2>');
+
+			// create the contentString for the basic infowindow
+			var contentString = '<h4 class="infowindow-title">' + marker.title + '</h4>'
+			for(var i = 0; i < marker.categories.length; i++){
+				contentString += '<span class="infowindow__badge">' + marker.categories[i] + '</span>';
+			}
+			contentString += '<p class="infowindow-description">' + marker.description + '</p>';
+
+			infowindow.setContent(contentString);
+
       infowindow.open(map, marker);
+
       // make sure that marker property is ccleared if infowindow is closed.
       infowindow.addListener('closeclick',function(){
         infowindow.setMarker = null;

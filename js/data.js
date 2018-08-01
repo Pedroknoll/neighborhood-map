@@ -13,8 +13,8 @@ var locations =  [
       description: 'A Casa de Pedra é o maior Ginásio de Escalada Esportiva do país. A unidade de Moema é a segunda da empresa e conta com dezenas de Boulderes, espaço de escalada exclusivo para crianças CLIMB4FUN®, além de sala de Yoga, equipamentos funcionais e muito mais..',
       categories: ['Climbing'],
       location: {
-        lat: -23.608335,
-        lng: -46.654981
+        lat: -23.608307,
+        lng: -46.654722
       }
     },
     {
@@ -31,8 +31,8 @@ var locations =  [
       description: 'Na Fabrica o foco é a escalada em Boulder. Nada de cordas, cadeirinhas ou mosquetões. São paredes de até 4 metros e meio altura com muitos problemas de todos os níveis que exigirão de sua força e raciocínio para serem superados.',
       categories: ['Climbing'],
       location: {
-        lat: -23.582944,
-        lng: -46.674069
+        lat: -23.5830444,
+        lng: -46.6741490
       }
     },
     {

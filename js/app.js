@@ -1,13 +1,19 @@
 'use strict';
 
+// declaring global variables
 var map;
-// create an empty array to store the markers
-var markers = [];
 
 
-// Set up the map for initialization.
+// CLIENT_ID and CLIENT_SECRET params to retrieve info from foursquare
+var CLIENT_ID = 'GHOKJ5MS1RUMWAY4GZHCOCDYOBTTSEE2E3PDGJ2RORGPDJWF';
+var CLIENT_SECRET = 'FKVS2BG2CXDXQSDK4OZ4J13DRIF5ZZAK1JGQBBRJRI2H3M1V';
+
+
+/**
+ * @function Google Map API Callback
+ * @description Map initialization
+ */
 function initMap() {
-
 	// setup the map constructor passing the mapOptions literal object
 	var mapOptions = {
 		center: {lat: -23.582944, lng: -46.674069},
@@ -22,30 +28,123 @@ function initMap() {
 	var initialCenter = map.getCenter();
 	var initialZoom = map.getZoom();
 	goToInitialPosition(map, initialCenter, initialZoom);
-
-	// function to return to center when click on the right mouse button
-	function goToInitialPosition(map, center, zoom){
-		google.maps.event.addListener(map, 'rightclick', function(){
-			map.setCenter(center);
-			map.setZoom(zoom);
-		});
-	};
 };
+
+
+/**
+ * @function Map centralization
+ * @description Return to center when click on the right mouse button
+ */
+function goToInitialPosition(map, center, zoom){
+	google.maps.event.addListener(map, 'rightclick', function(){
+		map.setCenter(center);
+		map.setZoom(zoom);
+	});
+};
+
+
+// create an object/class to represent the venue with foursquare data
+var Venue = function(data){
+	self = this;
+
+	this.title = data.name;
+	this.description = data.description;
+	this.categories = data.categories;
+	this.location = data.location;
+	this.address = '';
+	this.city = '';
+	this.state = '';
+	// -> INCLUIR ITEMS DE FOTOS APÓS DESCOMENTAR FUNÇÃO GET VENUES DETAILS
+
+	var foursquareSearchEndpoint = 'https://api.foursquare.com/v2/venues/search' +
+												'?limit=1' +
+												'&ll='+ this.location.lat +','+ this.location.lng +
+												'&client_id='+ CLIENT_ID +
+												'&client_secret='+ CLIENT_SECRET +
+												'&v=20140806';
+
+
+	$.getJSON(foursquareSearchEndpoint, function(){
+		console.log('Success');
+	})
+		.done(function(responseData){
+			var foursquareVenueId = responseData.response.venues[0].id;
+			// getVenueDetails(foursquareId); -> ATINGIU QUOTA DIÁRIA -> CONTINUAR SEM ELA
+
+			// PARA CONTINUAR -> DELETAR DEPOIS
+			var results = responseData.response.venues[0];
+			// console.log(results);
+			self.address = results.location.address;
+			self.city = results.location.city;
+			self.state = results.location.state;
+
+		})
+		.fail(function() {
+    	console.log( "error" );
+  	});
+
+
+	/**
+	* @function Get venue's details from foursquare
+	* @description Used as callback for the search request to foursquare
+	* @param {object} Foursquare data
+	*/
+	function getVenueDetails(id){
+		var foursquareDetailsEndpoint = 'https://api.foursquare.com/v2/venues/' +
+													id +
+													'?&client_id='+ CLIENT_ID +
+													'&client_secret='+ CLIENT_SECRET +
+													'&v=20140806';
+		$.getJSON(foursquareDetailsEndpoint, function(){
+			console.log('Success');
+		})
+			.done(function(responseData){
+				return responseData;
+			})
+			.fail(function() {
+				console.log( "error" );
+			});
+	};
+
+
+	this.marker = new google.maps.Marker({
+		map: map,
+		position: this.position,
+		title: this.title,
+		animation: google.maps.Animation.DROP,
+	});
+
+}
+
+
+
+
+
+
 
 
 var ViewModel = function(){
   var self = this;
 
-  self.isVisible = ko.observable(true);
-  // show/hide sidebar when the toggle button is clicked
-  self.toggleVisibility = function(){
-    self.isVisible(!self.isVisible());
-  };
+	this.locationList = ko.observableArray([]);
 
+	locations.forEach(function(locationItem){
+		self.locationList.push(new Venue(locationItem));
+	})
+
+	// console.log(self.locationList());
+
+
+	self.isVisible = ko.observable(true);
+	// show/hide sidebar when the toggle button is clicked
+	self.toggleVisibility = function(){
+		self.isVisible(!self.isVisible());
+	};
+
+/*
   // set up the markers render into the map
   var createMarkers = function(){
     var bounds = new google.maps.LatLngBounds();
-
     var largeInfowindow = new google.maps.InfoWindow();
 
     // create custom marker icons symbols
@@ -86,11 +185,10 @@ var ViewModel = function(){
 			// add click event handlers to the marker
 			marker.addListener('click', function(){
 				// when clicked, the marker bounces
-				toggleBounce(this);
+				bounceMarker(this);
 				// create an event to open the infowindow
 				populateInfoWindow(this, largeInfowindow);
 			});
-
     };
     map.fitBounds(bounds);
   }();
@@ -110,7 +208,7 @@ var ViewModel = function(){
   };
 
   // Bounces a marker three times
-  function toggleBounce(marker){
+  function bounceMarker(marker){
     if (marker.getAnimation() !== null){
       marker.setAnimation(null);
     } else {
@@ -134,8 +232,10 @@ var ViewModel = function(){
 			}
 			contentString += '<p class="infowindow-description">' + marker.description + '</p>';
 
-			infowindow.setContent(contentString);
+			// GET FORSQUARE INFOS
+			getFoursquareData(marker);
 
+			infowindow.setContent(contentString);
       infowindow.open(map, marker);
 
       // make sure that marker property is ccleared if infowindow is closed.
@@ -145,12 +245,85 @@ var ViewModel = function(){
     }
   };
 
+	// get the id of a venue according to latitude and longitude
+	function getFoursquareData(marker){
+		// transform the marker position object to literal
+		var position = marker.position.toJSON();
+		$.ajax({
+			url: 'https://api.foursquare.com/v2/venues/search',
+			dataType: 'json',
+			data: 'limit=1' +
+								'&ll='+ position.lat +','+ position.lng +
+								'&client_id='+ 'GHOKJ5MS1RUMWAY4GZHCOCDYOBTTSEE2E3PDGJ2RORGPDJWF' +
+								'&client_secret='+ 'FKVS2BG2CXDXQSDK4OZ4J13DRIF5ZZAK1JGQBBRJRI2H3M1V' +
+								'&v=20140806',
+				async: true,
+			success: function (data) {
+				getTeste(data);
+			},
+			error: function() {
+				console.log('Error to get venue ID');
+			}
+		});
+	};
+
+
+
+function getTeste(data){
+	var b = data.response.venues[0].id;
+	$.ajax({
+		url: 'https://api.foursquare.com/v2/venues/',
+		dataType: 'json',
+		data: b + 'photos' +
+						'?&client_id='+ 'GHOKJ5MS1RUMWAY4GZHCOCDYOBTTSEE2E3PDGJ2RORGPDJWF' +
+						'&client_secret='+ 'FKVS2BG2CXDXQSDK4OZ4J13DRIF5ZZAK1JGQBBRJRI2H3M1V' +
+						'&v=20140806',
+			async: true,
+		success: function(data){
+			console.log(data.response.venue);
+		},
+		error: function(){
+			console.log('Error to get venue data');
+		}
+	});
 }
+
+
+
+
+
+
+
+
+	// get venue Data
+	function getFoursquareVenueData(venueId){
+		$.ajax({
+			url: 'https://api.foursquare.com/v2/venues/',
+			dataType: 'json',
+			data: venueId +
+							'?&client_id='+ 'GHOKJ5MS1RUMWAY4GZHCOCDYOBTTSEE2E3PDGJ2RORGPDJWF' +
+							'&client_secret='+ 'FKVS2BG2CXDXQSDK4OZ4J13DRIF5ZZAK1JGQBBRJRI2H3M1V' +
+							'&v=20140806',
+				async: true,
+			success: function(data){
+				console.log(data.response.venue);
+			},
+			error: function(){
+				console.log('Error to get venue data');
+			}
+		});
+	};
+
+
+*/
+}
+
 
 // initialize the app
 var init = function(){
 
   initMap();
+
 
   ko.applyBindings(new ViewModel());
 }
@@ -159,8 +332,6 @@ var init = function(){
 
 /* TO DO
 - config infowindow
---- add description
---- add category
 --- add third part api (foursquare)
 
 - config filter

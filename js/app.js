@@ -2,6 +2,7 @@
 
 // declaring global variables
 var map;
+var markers = [];
 
 
 // CLIENT_ID and CLIENT_SECRET params to retrieve info from foursquare
@@ -28,12 +29,17 @@ function initMap() {
 	var initialCenter = map.getCenter();
 	var initialZoom = map.getZoom();
 	goToInitialPosition(map, initialCenter, initialZoom);
+
+	var infoWindow = new google.maps.InfoWindow();
+
+	ko.applyBindings(new ViewModel());
 };
 
 
 /**
- * @function Map centralization
- * @description Return to center when click on the right mouse button
+ * @function Map centralization and zooming
+ * @description Return to center and start zoom when click on the
+ * right mouse button
  */
 function goToInitialPosition(map, center, zoom){
 	google.maps.event.addListener(map, 'rightclick', function(){
@@ -54,6 +60,7 @@ var Venue = function(data){
 	this.address = '';
 	this.city = '';
 	this.state = '';
+
 	// -> INCLUIR ITEMS DE FOTOS APÓS DESCOMENTAR FUNÇÃO GET VENUES DETAILS
 
 	var foursquareSearchEndpoint = 'https://api.foursquare.com/v2/venues/search' +
@@ -78,17 +85,19 @@ var Venue = function(data){
 			self.city = results.location.city;
 			self.state = results.location.state;
 
+			this.visible = ko.observable(true);
+
 		})
 		.fail(function() {
     	console.log( "error" );
   	});
 
-
+	/* DEIXAR COMENTADO ATÉ QUE USEMOS DADOS DA API DO FOURSQUARE
 	/**
 	* @function Get venue's details from foursquare
 	* @description Used as callback for the search request to foursquare
 	* @param {object} Foursquare data
-	*/
+
 	function getVenueDetails(id){
 		var foursquareDetailsEndpoint = 'https://api.foursquare.com/v2/venues/' +
 													id +
@@ -105,34 +114,90 @@ var Venue = function(data){
 				console.log( "error" );
 			});
 	};
+	*/
 
+	// create custom marker icons symbols
+	var defaultIcon = createMarkerIcon('#1f2fda', '#ffffff');
+	var highlightedIcon = createMarkerIcon('#ffffff','#1f2fda');
 
 	this.marker = new google.maps.Marker({
 		map: map,
-		position: this.position,
+		position: this.location,
 		title: this.title,
-		animation: google.maps.Animation.DROP,
+		icon: defaultIcon,
+		animation: google.maps.Animation.DROP
 	});
+
+	this.marker.setMap(map);
+
+	// set marker icons event listeners for mouseover and for mouseout
+	this.marker.addListener('mouseover', function() {
+		this.setIcon(highlightedIcon);
+	});
+	this.marker.addListener('mouseout', function() {
+		this.setIcon(defaultIcon);
+	});
+
+	// add click event handlers to the marker
+	this.marker.addListener('click', function(){
+		// create an event to open the infowindow
+		//populateInfoWindow(this, largeInfowindow);
+		// when clicked, the marker bounces
+		bounceMarker(this);
+		// when clicked, pan to the marker position
+		map.panTo(this.getPosition());
+	});
+
 
 }
 
 
+/**
+ * @function Marker icon styling
+ * @description Create a custom symbol with the fill color and border color
+ * @param {string} Hex color
+ */
+function createMarkerIcon(markerFillColor, markerBorderColor){
+	return {
+		path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,' +
+		'-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
+		scale: 1.1,
+		fillOpacity: 1,
+		fillColor: markerFillColor,
+		strokeColor: markerBorderColor,
+		strokeWeight: 2
+	};
+};
 
-
-
+/**
+ * @function Marker bounces
+ * @description Bounces the marker two times
+ * @param {object} Marker
+ */
+function bounceMarker(marker){
+	if (marker.getAnimation() !== null){
+		marker.setAnimation(null);
+	} else {
+		marker.setAnimation(google.maps.Animation.BOUNCE);
+		setTimeout(function(){
+			marker.setAnimation(null);
+		}, 1300);
+	};
+};
 
 
 
 var ViewModel = function(){
   var self = this;
 
-	this.locationList = ko.observableArray([]);
+	this.listOfVenues = ko.observableArray([]);
 
-	locations.forEach(function(locationItem){
-		self.locationList.push(new Venue(locationItem));
-	})
+	locations.forEach(function(each){
+		self.listOfVenues.push(new Venue(each))
+	});
 
-	// console.log(self.locationList());
+	console.log(self.listOfVenues());
+
 
 
 	self.isVisible = ko.observable(true);
@@ -318,15 +383,6 @@ function getTeste(data){
 */
 }
 
-
-// initialize the app
-var init = function(){
-
-  initMap();
-
-
-  ko.applyBindings(new ViewModel());
-}
 
 
 

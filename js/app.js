@@ -27,29 +27,15 @@ function initMap() {
 	};
 	map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
-	// assign to variables the map center and zoom when rendered
-	var initialCenter = map.getCenter();
-	var initialZoom = map.getZoom();
-	goToInitialPosition(map, initialCenter, initialZoom);
-
 	infoWindow = new google.maps.InfoWindow();
 	bounds = new google.maps.LatLngBounds();
 	ko.applyBindings(new ViewModel());
-};
 
-
-/**
- * @function Map centralization and zooming
- * @description Return to center and start zoom when click on the
- * right mouse button
- */
-function goToInitialPosition(map, center, zoom){
+	// go to initial position when click on the right mouse button
 	google.maps.event.addListener(map, 'rightclick', function(){
-		map.setCenter(center);
-		map.setZoom(zoom);
+		map.fitBounds(bounds);
 	});
 };
-
 
 // create an object/class to represent the venue with foursquare data
 var Venue = function(data){
@@ -198,7 +184,11 @@ function populateInfoWindow(marker, infowindow) {
 		infowindow.marker = marker;
 
 		// create the contentString for the basic infowindow
-		var contentString = '<h4 class="infowindow-title">Teste MOTHAFUCKER</h4>'
+		var contentString = '<h4 class="infowindow-title">' + self.title + '</h4>'
+		for(var i = 0; i < self.categories.length; i++){
+			contentString += '<span class="infowindow__badge">' + self.categories[i] + '</span>';
+		}
+		contentString += '<p class="infowindow-description">' + self.description + '</p>';
 
 		infowindow.setContent(contentString);
 

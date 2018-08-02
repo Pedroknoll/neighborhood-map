@@ -34,8 +34,8 @@
             <input placeholder:"digite a modalidade"></input>
           </div>
         </div>
-        <ul class="sidebar-results">
-          <li class="sidebar-results__item">90 Graus</li>
+        <ul class="sidebar-results" data-bind="foreach: listOfVenues">
+          <li class="sidebar-results__item" data-bind="text: name"></li>
         </ul>
       </aside>
 

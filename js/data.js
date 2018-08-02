@@ -45,21 +45,21 @@ var locations =  [
       }
     },
     {
-      name: 'Tracer Parkour Cerro Corá',
-      description: 'Segunda unidade da Tracer Parkour, o espaço possui uma variedade de obstáculos móveis e imóveis, proporcionando uma infinita combinação de possibilidade de treinos de técnicas de Parkour.',
-      categories: ['Parkour'],
-      location: {
-        lat: -23.54124,
-        lng: -46.700801
-      }
-    },
-    {
       name: 'Fun Wake Park',
       description: 'Localizado dentro da Estância Alto da Serra (um dos maiores espaços para shows, eventos e lazer do Brasil), o "Fun Wake Park" conta com ótima estrutura - tanto para iniciantes como para atletas que já têm expêriencia em rampas e obstáculos.',
       categories: ['Wakeboard'],
       location: {
         lat: -23.791699,
         lng: -46.506069
+      }
+    },
+    {
+      name: 'Tracer Parkour Cerro Corá',
+      description: 'Segunda unidade da Tracer Parkour, o espaço possui uma variedade de obstáculos móveis e imóveis, proporcionando uma infinita combinação de possibilidade de treinos de técnicas de Parkour.',
+      categories: ['Parkour'],
+      location: {
+        lat: -23.54124,
+        lng: -46.700801
       }
     }
   ]; // locations

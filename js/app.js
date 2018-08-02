@@ -4,7 +4,6 @@
 var map;
 var infoWindow;
 var bounds;
-var markers = [];
 
 
 // CLIENT_ID and CLIENT_SECRET params to retrieve info from foursquare
@@ -39,9 +38,9 @@ function initMap() {
 
 // create an object/class to represent the venue with foursquare data
 var Venue = function(data){
-	self = this;
+	var self = this;
 
-	this.title = data.name;
+	this.name = data.name;
 	this.description = data.description;
 	this.categories = data.categories;
 	this.location = data.location;
@@ -49,6 +48,7 @@ var Venue = function(data){
 	this.city = '';
 	this.state = '';
 
+	/*
 	// -> INCLUIR ITEMS DE FOTOS APÓS DESCOMENTAR FUNÇÃO GET VENUES DETAILS
 
 	var foursquareSearchEndpoint = 'https://api.foursquare.com/v2/venues/search' +
@@ -80,7 +80,7 @@ var Venue = function(data){
     	console.log( "error" );
   	});
 
-	/* DEIXAR COMENTADO ATÉ QUE USEMOS DADOS DA API DO FOURSQUARE
+	 DEIXAR COMENTADO ATÉ QUE USEMOS DADOS DA API DO FOURSQUARE
 	/**
 	* @function Get venue's details from foursquare
 	* @description Used as callback for the search request to foursquare
@@ -111,7 +111,7 @@ var Venue = function(data){
 	this.marker = new google.maps.Marker({
 		map: map,
 		position: this.location,
-		title: this.title,
+		title: this.name,
 		icon: defaultIcon,
 		animation: google.maps.Animation.DROP
 	});
@@ -132,7 +132,13 @@ var Venue = function(data){
 	// add click event handlers to the marker
 	this.marker.addListener('click', function(){
 		// create an event to open the infowindow
-		populateInfoWindow(this, infoWindow);
+		// create the contentString for the basic infowindow
+		var contentString = '<h4 class="infowindow-title">' + self.name + '</h4>'
+		for(var i = 0; i < self.categories.length; i++){
+			contentString += '<span class="infowindow__badge">' + self.categories[i] + '</span>';
+		}
+		contentString += '<p class="infowindow-description">' + self.description + '</p>';
+		populateInfoWindow(this, infoWindow, contentString);
 		// when clicked, the marker bounces
 		bounceMarker(this);
 		// when clicked, pan to the marker position
@@ -141,11 +147,11 @@ var Venue = function(data){
 
 	map.fitBounds(bounds);
 
-}
+};
 
 
 /**
- * @function Marker icon styling
+ * @function createMarkerIcon
  * @description Create a custom symbol with the fill color and border color
  * @param {string} Hex color
  */
@@ -162,7 +168,7 @@ function createMarkerIcon(markerFillColor, markerBorderColor){
 };
 
 /**
- * @function Marker bounces
+ * @function bounceMarker
  * @description Bounces the marker two times
  * @param {object} Marker
  */
@@ -177,33 +183,30 @@ function bounceMarker(marker){
 	};
 };
 
-// Populate info InfoWindow
-function populateInfoWindow(marker, infowindow) {
+/**
+ * @function populateInfoWindow
+ * @description Set up the infowindow with content and behavior
+ * @param {object} Marker
+ * @param {object} infowindow
+ * @param {object} content
+ */
+function populateInfoWindow(marker, infowindow, content) {
 	// check to make sure that infowindow is not already open on this marker
 	if (infowindow.marker != marker) {
 		infowindow.marker = marker;
-
-		// create the contentString for the basic infowindow
-		var contentString = '<h4 class="infowindow-title">' + self.title + '</h4>'
-		for(var i = 0; i < self.categories.length; i++){
-			contentString += '<span class="infowindow__badge">' + self.categories[i] + '</span>';
-		}
-		contentString += '<p class="infowindow-description">' + self.description + '</p>';
-
-		infowindow.setContent(contentString);
-
-		// make sure that marker property is ccleared if infowindow is closed.
+		// set the infowindowcontent and call open method
+		infowindow.setContent(content);
+		infowindow.open(map, marker);
+		// make sure that marker property is cleared if infowindow is closed.
 		infowindow.addListener('closeclick',function(){
 			infowindow.marker = null;
 		});
-		infowindow.open(map, marker);
 	};
 };
 
 
-
 var ViewModel = function(){
-  var self = this;
+  self = this;
 
 	this.listOfVenues = ko.observableArray([]);
 
@@ -221,110 +224,8 @@ var ViewModel = function(){
 		self.isVisible(!self.isVisible());
 	};
 
+
 /*
-  // set up the markers render into the map
-  var createMarkers = function(){
-    var bounds = new google.maps.LatLngBounds();
-    var largeInfowindow = new google.maps.InfoWindow();
-
-    // create custom marker icons symbols
-    var defaultIcon = createMarkerIcon('#1f2fda', '#ffffff');
-    var highlightedIcon = createMarkerIcon('#ffffff','#1f2fda');
-
-    // iterate through the locations list from data.js
-    for(var i = 0; i < locations.length; i++){
-
-      // get position, title, description and category from locations
-      var position = locations[i].location;
-      var title = locations[i].name;
-			var description = locations[i].description;
-			var categories = locations[i].categories;
-
-      // create a marker per location
-      var marker = new google.maps.Marker({
-        map: map,
-        position: position,
-        title: title,
-				description: description,
-				categories: categories,
-        icon: defaultIcon,
-        animation: google.maps.Animation.DROP,
-        id: i
-      });
-      // push the marker to the marker array
-      markers.push(marker);
-      // extends the boundaries of the map for each marker
-      bounds.extend(marker.position);
-      // set marker icons event listeners for mouseover and for mouseout
-      marker.addListener('mouseover', function() {
-        this.setIcon(highlightedIcon);
-      });
-      marker.addListener('mouseout', function() {
-        this.setIcon(defaultIcon);
-      });
-			// add click event handlers to the marker
-			marker.addListener('click', function(){
-				// when clicked, the marker bounces
-				bounceMarker(this);
-				// create an event to open the infowindow
-				populateInfoWindow(this, largeInfowindow);
-			});
-    };
-    map.fitBounds(bounds);
-  }();
-
-  // function to create a custom symbol with the fill color and border color
-  // passing as parameters
-  function createMarkerIcon(markerFillColor, markerBorderColor){
-    return {
-      path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,' +
-      '-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
-      scale: 1.1,
-      fillOpacity: 1,
-      fillColor: markerFillColor,
-      strokeColor: markerBorderColor,
-      strokeWeight: 2
-    };
-  };
-
-  // Bounces a marker three times
-  function bounceMarker(marker){
-    if (marker.getAnimation() !== null){
-      marker.setAnimation(null);
-    } else {
-      marker.setAnimation(google.maps.Animation.BOUNCE);
-      setTimeout(function(){
-        marker.setAnimation(null);
-      }, 1300);
-    };
-  };
-
-  // Populate info InfoWindow
-  function populateInfoWindow(marker, infowindow) {
-    // check to make sure that infowindow is not already open on this marker
-    if (infowindow.marker != marker) {
-      infowindow.marker = marker;
-
-			// create the contentString for the basic infowindow
-			var contentString = '<h4 class="infowindow-title">' + marker.title + '</h4>'
-			for(var i = 0; i < marker.categories.length; i++){
-				contentString += '<span class="infowindow__badge">' + marker.categories[i] + '</span>';
-			}
-			contentString += '<p class="infowindow-description">' + marker.description + '</p>';
-
-			// GET FORSQUARE INFOS
-			getFoursquareData(marker);
-
-			infowindow.setContent(contentString);
-      infowindow.open(map, marker);
-
-      // make sure that marker property is ccleared if infowindow is closed.
-      infowindow.addListener('closeclick',function(){
-        infowindow.setMarker = null;
-      });
-    }
-  };
-
 	// get the id of a venue according to latitude and longitude
 	function getFoursquareData(marker){
 		// transform the marker position object to literal
@@ -367,14 +268,6 @@ function getTeste(data){
 		}
 	});
 }
-
-
-
-
-
-
-
-
 	// get venue Data
 	function getFoursquareVenueData(venueId){
 		$.ajax({
@@ -396,8 +289,7 @@ function getTeste(data){
 
 
 */
-}
-
+};
 
 
 

@@ -32,16 +32,11 @@
           <div class="sidebar-filter d-flex flex-wrap">
             <span class="align-self-center">Filtrar por atividades de</span>
             <span class="category-dropdown align-self-center">
-              <select>
-                <option>Todas categorias</option>
-                <option>Escalada</option>
-                <option>Parkour</option>
-                <option>Wakeboard</option>
-              </select>
+              <select data-bind="value: selectedCategory, options: availableCategories, optionsCaption: 'Todas Categorias'"></select>
             </span>
           </div>
         </div>
-        <ul class="sidebar-results" data-bind="foreach: venuesList">
+        <ul class="sidebar-results" data-bind="foreach: filteredList">
           <li class="sidebar-results__item" data-bind="text: name, click: showInfo"></li>
         </ul>
       </aside>

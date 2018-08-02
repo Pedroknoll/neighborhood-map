@@ -36,17 +36,24 @@ function initMap() {
 	});
 };
 
-// create an object/class to represent the venue with foursquare data
+
+/**
+ * @constructor Venue
+ * @description Represents an adventure sports venue
+ *
+ */
 var Venue = function(data){
 	var self = this;
 
 	this.name = data.name;
 	this.description = data.description;
-	this.categories = data.categories;
+	this.category = data.category;
 	this.location = data.location;
 	this.address = '';
 	this.city = '';
 	this.state = '';
+
+	this.visible = ko.observable(true);
 
 	/*
 	// -> INCLUIR ITEMS DE FOTOS APÓS DESCOMENTAR FUNÇÃO GET VENUES DETAILS
@@ -109,11 +116,19 @@ var Venue = function(data){
 	var highlightedIcon = createMarkerIcon('#ffffff','#1f2fda');
 
 	this.marker = new google.maps.Marker({
-		map: map,
 		position: this.location,
 		title: this.name,
 		icon: defaultIcon,
 		animation: google.maps.Animation.DROP
+	});
+
+	// show markers according to filter selected options on dropdown at UI
+	self.filteredMarkers = ko.computed(function(){
+		if(self.visible() === true){
+			self.marker.setMap(map);
+		} else {
+			self.marker.setMap(null);
+		}
 	});
 
 	this.marker.setMap(map);
@@ -133,11 +148,10 @@ var Venue = function(data){
 	this.marker.addListener('click', function(){
 		// create an event to open the infowindow
 		// create the contentString for the basic infowindow
-		var contentString = '<h4 class="infowindow-title">' + self.name + '</h4>'
-		for(var i = 0; i < self.categories.length; i++){
-			contentString += '<span class="infowindow__badge">' + self.categories[i] + '</span>';
-		}
-		contentString += '<p class="infowindow-description">' + self.description + '</p>';
+		var contentString = '<h4 class="infowindow-title">' + self.name + '</h4>' +
+												'<span class="infowindow__badge">' + self.category + '</span>' +
+												'<p class="infowindow-description">' + self.description + '</p>';
+
 		populateInfoWindow(this, infoWindow, contentString);
 		// when clicked, the marker bounces
 		bounceMarker(this);
@@ -213,20 +227,45 @@ function populateInfoWindow(marker, infowindow, content) {
 var ViewModel = function(){
   self = this;
 
+	// observable array populate with objects created from data
 	this.venuesList = ko.observableArray([]);
-
-	locations.forEach(function(each){
-		self.venuesList.push(new Venue(each))
+	locations.forEach(function(location){
+		self.venuesList.push(new Venue(location))
 	});
 
-	console.log(self.venuesList());
+	console.log(self.venuesList()); // -------------------------------> PARA DEBUGAR --- TIRAR DEPOIS DE PRONTO
 
-	self.isVisible = ko.observable(true);
+	// Filtering ----------------------------------------------
+	// generate a list of venues according the selected options
+	this.availableCategories = ko.observableArray([	'Escalada',
+																									'Parkour',
+																									'Wakeboard']);
+
+	this.selectedCategory = ko.observable('');
+
+	this.filteredList = ko.computed(function() {
+		var filter = self.selectedCategory();
+		if (filter) {
+			filter = self.selectedCategory().toLowerCase(); //
+			return ko.utils.arrayFilter(self.venuesList(), function(venue) {
+				var str = venue.category.toLowerCase();
+				var result = str.includes(filter);
+				venue.visible(result);
+				return result;
+			});
+		}
+		self.venuesList().forEach(function(venue) {
+			venue.visible(true);
+		});
+		return self.venuesList();
+	}, self);
+
 	// show/hide sidebar when the toggle button is clicked
+	self.isVisible = ko.observable(true);
 	self.toggleVisibility = function(){
 		self.isVisible(!self.isVisible());
 	};
-
+};
 
 /*
 	// get the id of a venue according to latitude and longitude
@@ -292,7 +331,7 @@ function getTeste(data){
 
 
 */
-};
+
 
 
 

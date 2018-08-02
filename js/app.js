@@ -267,6 +267,14 @@ var ViewModel = function(){
 	};
 };
 
+/**
+ * @function mapErrorHandling
+ * @description Handling with map errors
+ */
+function mapErrorHandling() {
+	alert("Google Maps has failed to load. Please try again later.");
+}
+
 /*
 	// get the id of a venue according to latitude and longitude
 	function getFoursquareData(marker){

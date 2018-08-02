@@ -147,6 +147,11 @@ var Venue = function(data){
 
 	map.fitBounds(bounds);
 
+	// function to show the infowindows as click the venue on list sidebar
+	this.showInfo = function(venue){
+		google.maps.event.trigger(self.marker, 'click');
+	};
+
 };
 
 
@@ -208,15 +213,13 @@ function populateInfoWindow(marker, infowindow, content) {
 var ViewModel = function(){
   self = this;
 
-	this.listOfVenues = ko.observableArray([]);
+	this.venuesList = ko.observableArray([]);
 
 	locations.forEach(function(each){
-		self.listOfVenues.push(new Venue(each))
+		self.venuesList.push(new Venue(each))
 	});
 
-	console.log(self.listOfVenues());
-	
-
+	console.log(self.venuesList());
 
 	self.isVisible = ko.observable(true);
 	// show/hide sidebar when the toggle button is clicked

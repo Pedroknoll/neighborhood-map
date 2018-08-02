@@ -2,6 +2,7 @@
 
 // declaring global variables
 var map;
+var infoWindow;
 var markers = [];
 
 
@@ -30,8 +31,7 @@ function initMap() {
 	var initialZoom = map.getZoom();
 	goToInitialPosition(map, initialCenter, initialZoom);
 
-	var infoWindow = new google.maps.InfoWindow();
-
+	infoWindow = new google.maps.InfoWindow();
 	ko.applyBindings(new ViewModel());
 };
 
@@ -141,7 +141,7 @@ var Venue = function(data){
 	// add click event handlers to the marker
 	this.marker.addListener('click', function(){
 		// create an event to open the infowindow
-		//populateInfoWindow(this, largeInfowindow);
+		populateInfoWindow(this, infoWindow);
 		// when clicked, the marker bounces
 		bounceMarker(this);
 		// when clicked, pan to the marker position
@@ -182,6 +182,25 @@ function bounceMarker(marker){
 		setTimeout(function(){
 			marker.setAnimation(null);
 		}, 1300);
+	};
+};
+
+// Populate info InfoWindow
+function populateInfoWindow(marker, infowindow) {
+	// check to make sure that infowindow is not already open on this marker
+	if (infowindow.marker != marker) {
+		infowindow.marker = marker;
+
+		// create the contentString for the basic infowindow
+		var contentString = '<h4 class="infowindow-title">Teste MOTHAFUCKER</h4>'
+
+		infowindow.setContent(contentString);
+
+		// make sure that marker property is ccleared if infowindow is closed.
+		infowindow.addListener('closeclick',function(){
+			infowindow.marker = null;
+		});
+		infowindow.open(map, marker);
 	};
 };
 

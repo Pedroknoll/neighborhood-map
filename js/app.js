@@ -215,7 +215,7 @@ var ViewModel = function(){
 	});
 
 	console.log(self.listOfVenues());
-
+	
 
 
 	self.isVisible = ko.observable(true);

@@ -29,9 +29,15 @@
       <aside id="sidebar-wrapper">
         <div class="sidebar-header">
           <p>Os melhores lugares para praticar esportes de aventura estão aqui!</p>
-          <div class="sidebar-filter d-flex justify-content-between">
-            <p>Filtrar por atividade</p>
-            <input placeholder:"digite a modalidade"></input>
+          <div class="sidebar-filter d-flex flex-wrap">
+            <span class="align-self-center">Filtrar por atividades de</span>
+            <span class="custom-dropdown align-self-center">
+              <select>
+                <option>Escalada</option>
+                <option>Parkour</option>
+                <option>Wakeboard</option>
+              </select>
+            </span>
           </div>
         </div>
         <ul class="sidebar-results" data-bind="foreach: listOfVenues">

@@ -3,6 +3,7 @@
 // declaring global variables
 var map;
 var infoWindow;
+var bounds;
 var markers = [];
 
 
@@ -32,6 +33,7 @@ function initMap() {
 	goToInitialPosition(map, initialCenter, initialZoom);
 
 	infoWindow = new google.maps.InfoWindow();
+	bounds = new google.maps.LatLngBounds();
 	ko.applyBindings(new ViewModel());
 };
 
@@ -130,6 +132,9 @@ var Venue = function(data){
 
 	this.marker.setMap(map);
 
+	// extends the boundaries of the map for each marker
+	bounds.extend(this.marker.position);
+
 	// set marker icons event listeners for mouseover and for mouseout
 	this.marker.addListener('mouseover', function() {
 		this.setIcon(highlightedIcon);
@@ -148,6 +153,7 @@ var Venue = function(data){
 		map.panTo(this.getPosition());
 	});
 
+	map.fitBounds(bounds);
 
 }
 

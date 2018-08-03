@@ -61,15 +61,14 @@ html, body {
   color: #252525;
   background-color: #ffffff;
 }
-.sidebar-filter > p{
-  margin-bottom: 0;
+.sidebar-filter > span{
+  margin: 10px 5px 5px 0px;
 }
 /* dropdown */
 .category-dropdown {
   position: relative;
   display: inline-block;
   vertical-align: middle;
-  margin: 10px;
 }
 .category-dropdown select {
   margin: 0;
@@ -147,10 +146,16 @@ html, body {
 /* infowindow */
 .gm-style .gm-style-iw {
   width: 200px !important;
-  min-height: 150px;
+  height: 275px !important;
+  overflow-y: scroll;
+}
+.infowindow-image {
+  height: 150px;
+  width: 100%;
+  background-position: center;
 }
 .infowindow-title {
-  padding: 0.7em 0em;
+  padding: 0.4em 0em;
 }
 .infowindow__badge {
   padding: 0.5em;
@@ -158,8 +163,11 @@ html, body {
   font-size: 0.9em;
   font-weight: bold;
   border-radius: 0.5em;
-  background-color: #7dcdcd;
+  background-color: #c7c7c7;
   color: #ffffff;
+}
+.infowindow-rating {
+  background-color: #25d692;
 }
 .infowindow-description {
   margin: 1.2em 0;
@@ -168,7 +176,9 @@ html, body {
   font-size: 1.2em;
   line-height: 1.4em;
 }
-
+.infoWindow.attribuition > img {
+  height: 10px;
+}
 /* animation sidebar is visible */
 #wrapper.menu--visible #sidebar-wrapper {
   width: 95%;
@@ -196,6 +206,9 @@ html, body {
   #wrapper.menu--visible #page-content-wrapper {
     padding-left: 40%;
   }
+  .infowindow-title {
+    padding: 0.7em 0em;
+  }
 }
 @media only screen and (min-width: 1280px) {
   #wrapper.menu--visible #sidebar-wrapper {
@@ -206,6 +219,5 @@ html, body {
   }
   .gm-style .gm-style-iw {
     width: 600px !important;
-    min-height: 150px;
   }
 }

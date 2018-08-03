@@ -49,15 +49,13 @@ var Venue = function(data){
 	this.description = data.description;
 	this.category = data.category;
 	this.location = data.location;
-	this.address = '';
-	this.city = '';
-	this.state = '';
+	this.formattedAddress = '';
+	this.rating = '';
+	this.photoUrl = '';
 
 	this.visible = ko.observable(true);
 
-	/*
-	// -> INCLUIR ITEMS DE FOTOS APÓS DESCOMENTAR FUNÇÃO GET VENUES DETAILS
-
+/*
 	var foursquareSearchEndpoint = 'https://api.foursquare.com/v2/venues/search' +
 												'?limit=1' +
 												'&ll='+ this.location.lat +','+ this.location.lng +
@@ -67,29 +65,21 @@ var Venue = function(data){
 
 
 	$.getJSON(foursquareSearchEndpoint, function(){
-		console.log('Success');
 	})
 		.done(function(responseData){
+
 			var foursquareVenueId = responseData.response.venues[0].id;
-			// getVenueDetails(foursquareId); -> ATINGIU QUOTA DIÁRIA -> CONTINUAR SEM ELA
 
-			// PARA CONTINUAR -> DELETAR DEPOIS
-			var results = responseData.response.venues[0];
-			// console.log(results);
-			self.address = results.location.address;
-			self.city = results.location.city;
-			self.state = results.location.state;
-
-			this.visible = ko.observable(true);
+			getVenueDetails(foursquareVenueId);
 
 		})
 		.fail(function() {
-    	console.log( "error" );
+			alert('Something went wrong with foursquare');
   	});
 
-	 DEIXAR COMENTADO ATÉ QUE USEMOS DADOS DA API DO FOURSQUARE
+
 	/**
-	* @function Get venue's details from foursquare
+	* @function getVenueDetail
 	* @description Used as callback for the search request to foursquare
 	* @param {object} Foursquare data
 
@@ -100,17 +90,21 @@ var Venue = function(data){
 													'&client_secret='+ CLIENT_SECRET +
 													'&v=20140806';
 		$.getJSON(foursquareDetailsEndpoint, function(){
-			console.log('Success');
 		})
 			.done(function(responseData){
-				return responseData;
+				var results = responseData.response.venue;
+				self.formattedAddress = results.location.formattedAddress;
+				self.rating = results.rating;
+
+				var venuePhoto = results.bestPhoto
+				self.photoUrl = venuePhoto.prefix + '200x100' + venuePhoto.suffix;
 			})
 			.fail(function() {
-				console.log( "error" );
+				alert('Something went wrong with foursquare');
 			});
 	};
-	*/
 
+*/
 	// create custom marker icons symbols
 	var defaultIcon = createMarkerIcon('#1f2fda', '#ffffff');
 	var highlightedIcon = createMarkerIcon('#ffffff','#1f2fda');
@@ -148,9 +142,18 @@ var Venue = function(data){
 	this.marker.addListener('click', function(){
 		// create an event to open the infowindow
 		// create the contentString for the basic infowindow
-		var contentString = '<h4 class="infowindow-title">' + self.name + '</h4>' +
-												'<span class="infowindow__badge">' + self.category + '</span>' +
-												'<p class="infowindow-description">' + self.description + '</p>';
+		var contentString = '<div class="infowindow-image" style="background-image: url(' + self.bestPhoto +');"></div>' +
+												'<h4 class="infowindow-title">' + self.name + '</h4>' +
+												'<div class="infowindow-header d-flex align-items-start flex-wrap">' +
+													'<span class="infowindow__badge align-self-center">' + self.category + '</span>' +
+													'<div class="align-self-center d-flex flex-wrap mt-1">' +
+														'<span class="align-self-center mr-1"> Foursquare Rating: </span>' +
+														'<span class="infowindow__badge infowindow-rating  align-self-center">' + self.rating + '10</span>' +
+													'</div>' +
+												'</div>' +
+												'<p class="infowindow-description">' + self.description + '</p>' +
+												'<p class="infowindow-description"> Endereço:  ' + self.formattedAddress + '</p>' +
+												'<span class="infowindow-attribuition float-right"><img src="./img/powered-by-foursquare-blue.svg"></span>';
 
 		populateInfoWindow(this, infoWindow, contentString);
 		// when clicked, the marker bounces
@@ -166,6 +169,53 @@ var Venue = function(data){
 		google.maps.event.trigger(self.marker, 'click');
 	};
 
+};
+
+
+var ViewModel = function(){
+  self = this;
+
+	// observable array populate with objects created from data
+	this.venuesList = ko.observableArray([]);
+	locations.forEach(function(location){
+		self.venuesList.push(new Venue(location))
+	});
+
+	// Filtering ----------------------------------------------
+	// generate a list of venues according the selected options
+	this.availableCategories = ko.observableArray([	'Escalada',
+																									'Parkour',
+																									'Wakeboard']);
+
+	this.selectedCategory = ko.observable('');
+
+	this.filteredList = ko.computed(function() {
+		var filter = self.selectedCategory();
+		if (filter) {
+			filter = self.selectedCategory().toLowerCase(); //
+			return ko.utils.arrayFilter(self.venuesList(), function(venue) {
+				var str = venue.category.toLowerCase();
+				var result = str.includes(filter);
+				venue.visible(result);
+				return result;
+			});
+		}
+		self.venuesList().forEach(function(venue) {
+			venue.visible(true);
+		});
+		return self.venuesList();
+	}, self);
+
+	// initial visibility of sidebar according screen width
+	if($(window).width() < 800){
+		self.isVisible = ko.observable(false);
+	} else {
+		self.isVisible = ko.observable(true);
+	};
+	// show/hide sidebar when the toggle button is clicked
+	self.toggleVisibility = function(){
+		self.isVisible(!self.isVisible());
+	};
 };
 
 
@@ -223,55 +273,6 @@ function populateInfoWindow(marker, infowindow, content) {
 	};
 };
 
-
-var ViewModel = function(){
-  self = this;
-
-	// observable array populate with objects created from data
-	this.venuesList = ko.observableArray([]);
-	locations.forEach(function(location){
-		self.venuesList.push(new Venue(location))
-	});
-
-	console.log(self.venuesList()); // -------------------------------> PARA DEBUGAR --- TIRAR DEPOIS DE PRONTO
-
-	// Filtering ----------------------------------------------
-	// generate a list of venues according the selected options
-	this.availableCategories = ko.observableArray([	'Escalada',
-																									'Parkour',
-																									'Wakeboard']);
-
-	this.selectedCategory = ko.observable('');
-
-	this.filteredList = ko.computed(function() {
-		var filter = self.selectedCategory();
-		if (filter) {
-			filter = self.selectedCategory().toLowerCase(); //
-			return ko.utils.arrayFilter(self.venuesList(), function(venue) {
-				var str = venue.category.toLowerCase();
-				var result = str.includes(filter);
-				venue.visible(result);
-				return result;
-			});
-		}
-		self.venuesList().forEach(function(venue) {
-			venue.visible(true);
-		});
-		return self.venuesList();
-	}, self);
-
-	// initial visibility of sidebar according screen width
-	if($(window).width() < 800){
-		self.isVisible = ko.observable(false);
-	} else {
-		self.isVisible = ko.observable(true);
-	};
-	// show/hide sidebar when the toggle button is clicked
-	self.toggleVisibility = function(){
-		self.isVisible(!self.isVisible());
-	};
-};
-
 /**
  * @function mapErrorHandling
  * @description Handling with map errors
@@ -279,68 +280,3 @@ var ViewModel = function(){
 function mapErrorHandling() {
 	alert("Google Maps has failed to load. Please try again later.");
 }
-
-/*
-	// get the id of a venue according to latitude and longitude
-	function getFoursquareData(marker){
-		// transform the marker position object to literal
-		var position = marker.position.toJSON();
-		$.ajax({
-			url: 'https://api.foursquare.com/v2/venues/search',
-			dataType: 'json',
-			data: 'limit=1' +
-								'&ll='+ position.lat +','+ position.lng +
-								'&client_id='+ 'GHOKJ5MS1RUMWAY4GZHCOCDYOBTTSEE2E3PDGJ2RORGPDJWF' +
-								'&client_secret='+ 'FKVS2BG2CXDXQSDK4OZ4J13DRIF5ZZAK1JGQBBRJRI2H3M1V' +
-								'&v=20140806',
-				async: true,
-			success: function (data) {
-				getTeste(data);
-			},
-			error: function() {
-				console.log('Error to get venue ID');
-			}
-		});
-	};
-
-
-
-function getTeste(data){
-	var b = data.response.venues[0].id;
-	$.ajax({
-		url: 'https://api.foursquare.com/v2/venues/',
-		dataType: 'json',
-		data: b + 'photos' +
-						'?&client_id='+ 'GHOKJ5MS1RUMWAY4GZHCOCDYOBTTSEE2E3PDGJ2RORGPDJWF' +
-						'&client_secret='+ 'FKVS2BG2CXDXQSDK4OZ4J13DRIF5ZZAK1JGQBBRJRI2H3M1V' +
-						'&v=20140806',
-			async: true,
-		success: function(data){
-			console.log(data.response.venue);
-		},
-		error: function(){
-			console.log('Error to get venue data');
-		}
-	});
-}
-	// get venue Data
-	function getFoursquareVenueData(venueId){
-		$.ajax({
-			url: 'https://api.foursquare.com/v2/venues/',
-			dataType: 'json',
-			data: venueId +
-							'?&client_id='+ 'GHOKJ5MS1RUMWAY4GZHCOCDYOBTTSEE2E3PDGJ2RORGPDJWF' +
-							'&client_secret='+ 'FKVS2BG2CXDXQSDK4OZ4J13DRIF5ZZAK1JGQBBRJRI2H3M1V' +
-							'&v=20140806',
-				async: true,
-			success: function(data){
-				console.log(data.response.venue);
-			},
-			error: function(){
-				console.log('Error to get venue data');
-			}
-		});
-	};
-
-
-*/

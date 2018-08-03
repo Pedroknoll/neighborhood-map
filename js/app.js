@@ -20,7 +20,6 @@ function initMap() {
 	var mapOptions = {
 		center: {lat: -23.582944, lng: -46.674069},
     zoom: 12,
-		gestureHandling: 'cooperative',
     styles: mapStyles,
     mapTypeControl: false,
 		fullscreenControl: false

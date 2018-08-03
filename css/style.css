@@ -62,7 +62,7 @@ html, body {
   background-color: #ffffff;
 }
 .sidebar-filter > span{
-  margin: 10px 5px 5px 0px;
+  margin: 0.625em 0.3em 0.3em 0px;
 }
 /* dropdown */
 .category-dropdown {
@@ -153,6 +153,8 @@ html, body {
   height: 150px;
   width: 100%;
   background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 .infowindow-title {
   padding: 0.4em 0em;
@@ -176,7 +178,11 @@ html, body {
   font-size: 1.2em;
   line-height: 1.4em;
 }
-.infoWindow.attribuition > img {
+.infowindow-attribuition {
+  float: right;
+  margin: 0.3em;
+}
+.infowindow-attribuition > img {
   height: 10px;
 }
 /* animation sidebar is visible */

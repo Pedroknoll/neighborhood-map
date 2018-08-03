@@ -10,7 +10,6 @@ var bounds;
 var CLIENT_ID = 'GHOKJ5MS1RUMWAY4GZHCOCDYOBTTSEE2E3PDGJ2RORGPDJWF';
 var CLIENT_SECRET = 'FKVS2BG2CXDXQSDK4OZ4J13DRIF5ZZAK1JGQBBRJRI2H3M1V';
 
-
 /**
  * @function Google Map API Callback
  * @description Map initialization
@@ -55,7 +54,7 @@ var Venue = function(data){
 
 	this.visible = ko.observable(true);
 
-/*
+
 	var foursquareSearchEndpoint = 'https://api.foursquare.com/v2/venues/search' +
 												'?limit=1' +
 												'&ll='+ this.location.lat +','+ this.location.lng +
@@ -82,7 +81,7 @@ var Venue = function(data){
 	* @function getVenueDetail
 	* @description Used as callback for the search request to foursquare
 	* @param {object} Foursquare data
-
+ 	**/
 	function getVenueDetails(id){
 		var foursquareDetailsEndpoint = 'https://api.foursquare.com/v2/venues/' +
 													id +
@@ -97,14 +96,13 @@ var Venue = function(data){
 				self.rating = results.rating;
 
 				var venuePhoto = results.bestPhoto
-				self.photoUrl = venuePhoto.prefix + '200x100' + venuePhoto.suffix;
+				self.photoUrl = venuePhoto.prefix + '600x150' + venuePhoto.suffix;
 			})
 			.fail(function() {
 				alert('Something went wrong with foursquare');
 			});
 	};
 
-*/
 	// create custom marker icons symbols
 	var defaultIcon = createMarkerIcon('#1f2fda', '#ffffff');
 	var highlightedIcon = createMarkerIcon('#ffffff','#1f2fda');
@@ -142,18 +140,18 @@ var Venue = function(data){
 	this.marker.addListener('click', function(){
 		// create an event to open the infowindow
 		// create the contentString for the basic infowindow
-		var contentString = '<div class="infowindow-image" style="background-image: url(' + self.bestPhoto +');"></div>' +
+		var contentString = '<div class="infowindow-image" style="background-image: url(' + self.photoUrl +');"></div>' +
 												'<h4 class="infowindow-title">' + self.name + '</h4>' +
 												'<div class="infowindow-header d-flex align-items-start flex-wrap">' +
 													'<span class="infowindow__badge align-self-center">' + self.category + '</span>' +
 													'<div class="align-self-center d-flex flex-wrap mt-1">' +
 														'<span class="align-self-center mr-1"> Foursquare Rating: </span>' +
-														'<span class="infowindow__badge infowindow-rating  align-self-center">' + self.rating + '10</span>' +
+														'<span class="infowindow__badge infowindow-rating  align-self-center">' + self.rating + '</span>' +
 													'</div>' +
 												'</div>' +
 												'<p class="infowindow-description">' + self.description + '</p>' +
 												'<p class="infowindow-description"> Endereço:  ' + self.formattedAddress + '</p>' +
-												'<span class="infowindow-attribuition float-right"><img src="./img/powered-by-foursquare-blue.svg"></span>';
+												'<span class="infowindow-attribuition"><img src="./img/powered-by-foursquare-blue.svg"></span>';
 
 		populateInfoWindow(this, infoWindow, contentString);
 		// when clicked, the marker bounces

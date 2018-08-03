@@ -22,7 +22,8 @@ function initMap() {
     zoom: 12,
 		gestureHandling: 'cooperative',
     styles: mapStyles,
-    mapTypeControl: false
+    mapTypeControl: false,
+		fullscreenControl: false
 	};
 	map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
@@ -260,8 +261,13 @@ var ViewModel = function(){
 		return self.venuesList();
 	}, self);
 
+	// initial visibility of sidebar according screen width
+	if($(window).width() < 800){
+		self.isVisible = ko.observable(false);
+	} else {
+		self.isVisible = ko.observable(true);
+	};
 	// show/hide sidebar when the toggle button is clicked
-	self.isVisible = ko.observable(true);
 	self.toggleVisibility = function(){
 		self.isVisible(!self.isVisible());
 	};
@@ -338,16 +344,4 @@ function getTeste(data){
 	};
 
 
-*/
-
-
-
-
-/* TO DO
-- config infowindow
---- add third part api (foursquare)
-
-- config filter
-- confirg list
-- error event handlers
 */

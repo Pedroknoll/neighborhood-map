@@ -37,7 +37,7 @@
           </div>
         </div>
         <ul class="sidebar-results" data-bind="foreach: filteredList">
-          <li class="sidebar-results__item" data-bind="text: name, click: showInfo"></li>
+          <li class="sidebar-results__item" data-bind="text: name, click:function() {$parent.toggleVisibility(); showInfo()}"></li>
         </ul>
       </aside>
 

@@ -6,8 +6,11 @@ The website lists some adventurous sports venues in map. The users can:
 
 # Pre-requisites
 - Knockout js
-- Foursquare API
 - Jquery
+
+# APIS
+- Google Maps API
+- Foursquare API
 
 # install
 1. Clone or download this repo

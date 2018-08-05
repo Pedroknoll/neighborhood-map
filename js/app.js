@@ -18,9 +18,9 @@ function initMap() {
 	// setup the map constructor passing the mapOptions literal object
 	var mapOptions = {
 		center: {lat: -23.582944, lng: -46.674069},
-    zoom: 12,
-    styles: mapStyles,
-    mapTypeControl: false,
+		zoom: 12,
+		styles: mapStyles,
+		mapTypeControl: false,
 		fullscreenControl: false
 	};
 	map = new google.maps.Map(document.getElementById('map'), mapOptions);
